@@ -1,0 +1,13 @@
+operator 0x271e75c8b09d51a88c656c998265ee940db82211d50b54b46e09d65e3d9537f7
+
+package soldier: 0x34ab40f7d240d922a8e1071fc248ca85038ddef6fb14ac057e1de908cd7fe9d6
+
+package suimarket: 0x0516d40c9f9826b387900d0c64865f7e62a8b1da4b973b66d94bed961f25dbe6
+
+publisher create market: 0xc31fa103b87fb4f77bf6769d36586cef92bc4f4534a7c1fc38b4f76b72f4beaa
+
+seller create merchant: 0xbbcfae57733a110f194b650cad7b70798831c2d858ab85a2ac26cebf85fcbf02
+
+seller create listing: BxVxqTjMAi7Uyu65wK311Xz4ALub9zbE7rUnhTBCBixM
+
+buyer bought merchant: 4czTXq6CJoE6qU5Qk1Ueycx7b2wDEvsJ74JcAZRmGxE8

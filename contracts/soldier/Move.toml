@@ -1,8 +1,9 @@
 [package]
-name = "Suimarket"
+name = "Soldier"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
+published-at = "0x34ab40f7d240d922a8e1071fc248ca85038ddef6fb14ac057e1de908cd7fe9d6"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
@@ -13,14 +14,12 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 
 # For local dependencies use `local = path`. Path is relative to the package root
 # Local = { local = "../path/to" }
-Soldier = { local = "../soldier"}
 
 # To resolve a version conflict and force a specific version for dependency
 # override use `override = true`
 # Override = { local = "../conflicting/version", override = true }
 
 [addresses]
-suimarket = "0x0"
 soldier = "0x34ab40f7d240d922a8e1071fc248ca85038ddef6fb14ac057e1de908cd7fe9d6"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:

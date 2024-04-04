@@ -4,3 +4,6 @@ frontend/.next
 frontend/.env
 
 contracts/*/build
+contracts/*/Move.lock
+
+.vscode/

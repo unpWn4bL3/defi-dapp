@@ -10,13 +10,13 @@ module suimarket::market {
     const ENotOwner:u64 = 0;
     const EAmountIncorrect:u64 = 1;
 
-    struct Marketplace<phantom COIN> has key {
+    public struct Marketplace<phantom COIN> has key {
         id: UID,
         items: Bag,
         payments: Table<address, Coin<COIN>>,
     }
 
-    struct Listing has key,store {
+    public struct Listing has key,store {
         id: UID,
         ask: u64,
         owner: address,
@@ -38,7 +38,7 @@ module suimarket::market {
         ctx: &mut TxContext,
     ) {
         let item_id = object::id(&item);
-        let listing = Listing{
+        let mut listing = Listing{
             id: object::new(ctx),
             ask:ask,
             owner: tx_context::sender(ctx),
@@ -52,7 +52,7 @@ module suimarket::market {
         item_id:ID,
         ctx:&TxContext,
     ):T {
-        let Listing{id,owner,ask:_} = bag::remove(&mut marketplace.items, item_id);
+        let Listing{mut id,owner,ask:_} = bag::remove(&mut marketplace.items, item_id);
         assert!(tx_context::sender(ctx)==owner, ENotOwner);
         let item = ofield::remove(&mut id, true);
         object::delete(id);
@@ -73,7 +73,7 @@ module suimarket::market {
         item_id:ID,
         paid: Coin<COIN>,
     ): T {
-        let Listing{id,ask,owner} = bag::remove(&mut marketplace.items, item_id);
+        let Listing{mut id,ask,owner} = bag::remove(&mut marketplace.items, item_id);
         assert!(ask == coin::value(&paid),EAmountIncorrect);
         if (table::contains<address,Coin<COIN>>(&mut marketplace.payments,owner)) {
             coin::join(

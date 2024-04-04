@@ -1,0 +1,17 @@
+--- sources/market.move
++++ sources/market.move
+@@ -13 +13 @@
+-    struct Marketplace<phantom COIN> has key {
++    public struct Marketplace<phantom COIN> has key {
+@@ -19 +19 @@
+-    struct Listing has key,store {
++    public struct Listing has key,store {
+@@ -41 +41 @@
+-        let listing = Listing{
++        let mut listing = Listing{
+@@ -55 +55 @@
+-        let Listing{id,owner,ask:_} = bag::remove(&mut marketplace.items, item_id);
++        let Listing{mut id,owner,ask:_} = bag::remove(&mut marketplace.items, item_id);
+@@ -76 +76 @@
+-        let Listing{id,ask,owner} = bag::remove(&mut marketplace.items, item_id);
++        let Listing{mut id,ask,owner} = bag::remove(&mut marketplace.items, item_id);

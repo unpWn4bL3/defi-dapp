@@ -1,20 +1,15 @@
 import React from 'react';
 import './App.css';
-import { MerchantCard } from './pages/merchant';
-import { TestMerchantService } from './services/merchantService';
+import { Merchant } from './pages/merchant';
+import { MerchantService } from './services/merchantService';
+
+const SOLDIER_PACKAGE_ID = process.env.REACT_APP_SOLDIER_PACKAGE_ID!;
+const merchantService = new MerchantService(SOLDIER_PACKAGE_ID);
 
 function App() {
-
-  const merchantData = {
-    id: "123",
-    name: "but_who_ami?",
-    power: 5,
-  };
-
-  TestMerchantService();
-
+  const objectID = "0xf306cdc8137f82b42f8ca165526f47d49acbe945104a43a0f2004985a53d5fbc";
   return (
-    <MerchantCard merchant={merchantData}></MerchantCard>
+    <Merchant id={objectID} service={merchantService}></Merchant>
   )
 }
 

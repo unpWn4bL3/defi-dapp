@@ -1,15 +1,17 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { MerchantCard } from './pages/merchant';
+import { TestMerchantService } from './services/merchantService';
 
 function App() {
 
   const merchantData = {
     id: "123",
-    name: "Merchant Name",
+    name: "but_who_ami?",
     power: 5,
   };
+
+  TestMerchantService();
 
   return (
     <MerchantCard merchant={merchantData}></MerchantCard>

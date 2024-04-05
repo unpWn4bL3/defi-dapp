@@ -10,7 +10,7 @@ interface Merchant {
 // 定义组件
 const MerchantCard: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
     return (
-        <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl">
+        <div className="w-96 mx-auto bg-gradient-to-r from-yellow-300 to-red-300 rounded-xl shadow-md overflow-hidden md:max-w-2xl">
             <div className="md:flex">
                 <div className="p-8">
                     <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
@@ -19,7 +19,7 @@ const MerchantCard: React.FC<{ merchant: Merchant }> = ({ merchant }) => {
                     <div className="block mt-1 text-lg leading-tight font-medium text-black">
                         {merchant.name}
                     </div>
-                    <p className="mt-2 text-slate-500">
+                    <p className="mt-2 text-pink-600">
                         Power: {merchant.power.toLocaleString()}
                     </p>
                 </div>

@@ -4,10 +4,10 @@ import { getZkLoginSignature, jwtToAddress, genAddressSeed, getExtendedEphemeral
 import { jwtDecode } from 'jwt-decode'
 import { SUI_CLIENT } from './suiService'
 
-const PROVER_URL = process.env.REACT_APP_PROVER_URL!
-const REDIRECT_URL = process.env.REACT_APP_REDIRECT_URL!
-const OPENID_PROVIDER_URL = process.env.REACT_APP_OPENID_PROVIDER_URL!
-const CLIENT_ID = process.env.REACT_APP_CLIENT_ID!
+const REACT_APP_PROVER_URL = process.env.REACT_APP_PROVER_URL!
+const REACT_APP_REDIRECT_URL = process.env.REACT_APP_REDIRECT_URL!
+const REACT_APP_OPENID_PROVIDER_URL = process.env.REACT_APP_OPENID_PROVIDER_URL!
+const REACT_APP_CLIENT_ID = process.env.REACT_APP_CLIENT_ID!
 
 export class AuthService {
   static getAddressSeed() {
@@ -39,7 +39,7 @@ export class AuthService {
 
   private static async verifyPartialZkLoginSignature(zkRequestPayload: any) {
     try {
-      const proofResponse = await fetch(PROVER_URL, {
+      const proofResponse = await fetch(REACT_APP_PROVER_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -142,8 +142,8 @@ export class AuthService {
     sessionStorage.setItem('jwt_data', JSON.stringify(jwtData))
 
     const params = new URLSearchParams({
-      client_id: CLIENT_ID,
-      redirect_uri: REDIRECT_URL,
+      client_id: REACT_APP_CLIENT_ID,
+      redirect_uri: REACT_APP_REDIRECT_URL,
       response_type: 'id_token',
       scope: 'openid email',
       nonce
@@ -151,7 +151,7 @@ export class AuthService {
     console.log(params)
 
     try {
-      const response = await fetch(OPENID_PROVIDER_URL, {
+      const response = await fetch(REACT_APP_OPENID_PROVIDER_URL, {
         method: 'GET'
       })
       const data = await response.json()

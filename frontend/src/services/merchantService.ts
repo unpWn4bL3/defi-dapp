@@ -1,4 +1,5 @@
 import { TransactionBlock } from "@mysten/sui.js/transactions";
+import { bcs } from "@mysten/bcs";
 import { AuthService } from "./authService";
 import { SUI_CLIENT } from "./suiService";
 
@@ -23,12 +24,18 @@ export class MerchantService {
     }
 
     async QueryAllMerchants() {
-        const sender = AuthService.walletAddress();
+        let sender = "";
+        try {
+            sender = AuthService.walletAddress();
+        } catch (error) {
+            console.log('QueryAllMerchants error: ', error)
+            return new Promise<[]>(() => []);
+        }
+
         console.log(sender)
         let ownedObjects = SUI_CLIENT.getOwnedObjects({
             owner: sender
         });
-        console.log(ownedObjects)
         let ownedObjectsDetails = await Promise.all(
             (await ownedObjects).data.map(async (obj) =>
                 await this.QueryMerchant(obj.data?.objectId!)
@@ -52,8 +59,9 @@ export class MerchantService {
         const txData = {
             target: `${SOLDIER_PACKAGE_ID}::merchant::new_merchant`,
             arguments: [
-                txb.pure.string(name),
-                txb.pure.address(this.clock_id),
+                // txb.pure.(name),
+                txb.pure(bcs.string().serialize(name).toBytes()),
+                txb.object(this.clock_id),
             ],
         }
         return this.makeMoveCall(txData, txb);
@@ -64,11 +72,12 @@ export class MerchantService {
         const sender = AuthService.walletAddress();
         txb.setSender(sender);
         txb.moveCall(txData);
-        const { bytes, signature } = await txb.sign({
+        const { bytes, signature: userSignature } = await txb.sign({
             client: SUI_CLIENT,
             signer: keypair,
         })
-        const zkLoginSignature = await AuthService.generateZkLoginSignature(signature);
+        console.log(userSignature);
+        const zkLoginSignature = await AuthService.generateZkLoginSignature(userSignature);
         return SUI_CLIENT.executeTransactionBlock({
             transactionBlock: bytes,
             signature: zkLoginSignature,

@@ -19,7 +19,7 @@ const Merchant: React.FC<MerchantProps> = ({ id, name, power }) => {
                         {name}
                     </div>
                     <p className="mt-2 text-pink-600">
-                        Power: {power.toLocaleString()}
+                        Power: {"0x" + Number(power).toString(16)}
                     </p>
                 </div>
             </div>

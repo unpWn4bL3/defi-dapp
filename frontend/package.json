@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@mysten/bcs": "^0.11.1",
     "@mysten/sui.js": "^0.51.2",
     "@mysten/zklogin": "^0.5.2",
     "autoprefixer": "^10.4.19",

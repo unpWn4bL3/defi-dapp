@@ -21,7 +21,7 @@ Soldier = { local = "../soldier"}
 
 [addresses]
 suimarket = "0x0"
-soldier = "0x34ab40f7d240d922a8e1071fc248ca85038ddef6fb14ac057e1de908cd7fe9d6"
+soldier = "0x92f195cce2802ea5e5d91cb66ab215b9e85b22a4cc11d85baabed257776b7680"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.

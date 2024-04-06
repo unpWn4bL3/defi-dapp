@@ -19,3 +19,11 @@ seller create listing: 0x7d0c367deab7fac5bf240377ec419c59b33be1d5216b36554953c45
 buyer bought merchant: AJvq1Jwykc4Q6UPms425xPKxjSAhqru8noG1F5KcL9sR
 
 seller get profits: 4xsri3kW81sUChzzbHuMN5UfaYYLi9WaKR4R2W9HptHy
+
+# contract on devnet
+
+publisher 0x271e75c8b09d51a88c656c998265ee940db82211d50b54b46e09d65e3d9537f7
+
+package soldier: 0x92f195cce2802ea5e5d91cb66ab215b9e85b22a4cc11d85baabed257776b7680
+
+package suimarket: 0xebeaf306f1a9e5d590fa1b46fec067e2045f169ff84a06e1499f8a927dfbf49c

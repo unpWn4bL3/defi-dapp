@@ -3,6 +3,7 @@ import { Ed25519Keypair } from '@mysten/sui.js/keypairs/ed25519'
 import { getZkLoginSignature, jwtToAddress, genAddressSeed, getExtendedEphemeralPublicKey, generateRandomness, generateNonce } from '@mysten/zklogin'
 import { jwtDecode } from 'jwt-decode'
 import { SUI_CLIENT } from './suiService'
+import { json } from 'stream/consumers'
 
 const PROVER_URL = process.env.REACT_APP_PROVER_URL!
 const REDIRECT_URL = process.env.REACT_APP_REDIRECT_URL!
@@ -42,9 +43,10 @@ export class AuthService {
       const proofResponse = await fetch(PROVER_URL, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: zkRequestPayload
+        body: JSON.stringify(zkRequestPayload),
+        // body: zkRequestPayload,
       })
       const partialZkLoginSignature = await proofResponse.json() as PartialZkLoginSignature
       return partialZkLoginSignature

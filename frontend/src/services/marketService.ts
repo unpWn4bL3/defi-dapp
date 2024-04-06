@@ -4,12 +4,16 @@ import { AuthService } from "./authService";
 
 export class MarketService {
     package_id: string;
-    constructor(package_id: string) {
+    market_id: string;
+
+    constructor(package_id: string, market_id: string) {
         this.package_id = package_id;
+        this.market_id = market_id;
     }
-    async sell_merchant(market_id: string, merchant_id: string, price: number, setOrderID: (id: number) => {}) {
+    async sell_merchant(merchant_id: string, price: number, setOrderID: (id: number) => void) {
+        console.debug("MarketService.sell_merchant called with: ", merchant_id, price)
         const market_data = await SUI_CLIENT.getObject({
-            id: market_id,
+            id: this.market_id,
             options: {
                 showContent: true,
             }
@@ -21,7 +25,7 @@ export class MarketService {
         const txData = {
             target: `${this.package_id}::merchantmarket::sell_merchant`,
             arguments: [
-                txb.object(market_id),
+                txb.object(this.market_id),
                 txb.object(merchant_id),
                 txb.pure(price),
             ]
@@ -29,12 +33,12 @@ export class MarketService {
         return this.makeMoveCall(txData, txb);
     }
 
-    async buy_merchant(market_id: string, order_id: number, coin_id: string) {
+    async buy_merchant(order_id: number, coin_id: string) {
         const txb = new TransactionBlock();
         const txData = {
             target: `${this.package_id}::merchantmarket::buy_merchant`,
             arguments: [
-                txb.object(market_id),
+                txb.object(this.market_id),
                 txb.pure(order_id),
                 txb.object(coin_id),
             ]
@@ -42,12 +46,12 @@ export class MarketService {
         return this.makeMoveCall(txData, txb);
     }
 
-    async get_profits(market_id: string) {
+    async get_profits() {
         const txb = new TransactionBlock();
         const txData = {
             target: `${this.package_id}::merchantmarket::get_profits`,
             arguments: [
-                txb.object(market_id),
+                txb.object(this.market_id),
             ]
         }
         return this.makeMoveCall(txData, txb)

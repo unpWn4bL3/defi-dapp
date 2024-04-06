@@ -6,13 +6,15 @@ import { LoginButton } from './components/loginButton';
 import { MerchantListContainer } from './containers/merchantListContainer';
 import { LogoutButton } from './components/logoutButton';
 import { MarketService } from './services/marketService';
+import { SellMerchant } from './components/market';
 
 const SOLDIER_PACKAGE_ID = process.env.REACT_APP_SOLDIER_PACKAGE_ID!;
 const MARKET_PACKAGE_ID = process.env.REACT_APP_MARKET_PACKAGE_ID!;
+const MARKET_ID = process.env.REACT_APP_MARKET_ID!;
 
 const merchantService = new MerchantService(SOLDIER_PACKAGE_ID);
 const authService = new AuthService();
-const marketService = new MarketService(MARKET_PACKAGE_ID);
+const marketService = new MarketService(MARKET_PACKAGE_ID, MARKET_ID);
 
 function App() {
   useEffect(() => {
@@ -43,6 +45,10 @@ function App() {
         </div>
       </header>
       <MerchantListContainer merchantService={merchantService} />
+
+      <div className='grid'>
+        <SellMerchant service={marketService} />
+      </div>
     </div>
   )
 }

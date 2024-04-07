@@ -11,7 +11,7 @@ module soldier::merchant {
         power: u64,
     }
 
-    const POWER_LIMIT:u64 = 0xdeadbeefcafebabe;
+    const POWER_LIMIT:u64 = 0xdeadbeef;
 
     public entry fun new_merchant(name_vec:vector<u8>, clock: &Clock, ctx:&mut TxContext){
         let id = object::new(ctx);

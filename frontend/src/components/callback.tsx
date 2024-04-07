@@ -5,6 +5,10 @@ export const Callback = () => {
         const handleCallback = async () => {
             try {
                 const params = new URLSearchParams(window.location.hash.substring(1));
+                console.log(params);
+                if (params.size === 0) {
+                    window.location.href = '/app'
+                }
                 const jwtToken = params.get('id_token');
                 if (!jwtToken) {
                     throw Error("jwtToken is null");

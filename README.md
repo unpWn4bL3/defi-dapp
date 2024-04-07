@@ -2,7 +2,7 @@
 
 ## How to deploy
 
-All following instruction is tested on **devnet**
+All following instruction is tested on **devnet**, with move version **2024.beta**
 
 1. Configure your Google OAuth, add `http://localhost:3000` to allowed JavaScript origin and redirect URL
 

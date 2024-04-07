@@ -51,7 +51,7 @@ const MerchantListContainer: React.FC<MerchantListContainerProps> = ({ merchantS
     }, [merchantService])
 
     return (
-        <div className="">
+        <div className="w-3/4">
             <MerchantCreateContainer merchantService={merchantService} />
             <MerchantList merchants={merchants} />
         </div>

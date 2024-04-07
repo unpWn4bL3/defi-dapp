@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import './App.css';
 import { MerchantService } from './services/merchantService';
 import { AuthService } from './services/authService';
@@ -6,7 +6,7 @@ import { LoginButton } from './components/loginButton';
 import { MerchantListContainer } from './containers/merchantListContainer';
 import { LogoutButton } from './components/logoutButton';
 import { MarketService } from './services/marketService';
-import { SellMerchant } from './components/market';
+import { BuyMerchant, GetProfits, SellMerchant } from './components/market';
 
 const SOLDIER_PACKAGE_ID = process.env.REACT_APP_SOLDIER_PACKAGE_ID!;
 const MARKET_PACKAGE_ID = process.env.REACT_APP_MARKET_PACKAGE_ID!;
@@ -17,15 +17,9 @@ const authService = new AuthService();
 const marketService = new MarketService(MARKET_PACKAGE_ID, MARKET_ID);
 
 function App() {
-  useEffect(() => {
-    const f = async () => {
-      // await marketService.get_listings(process.env.REACT_APP_MARKET_ID!)
-      console.log(AuthService.walletAddress());
-    }
-    f();
-  }, [])
   return (
-    <div className='bg-rose-100 h-screen w-screen' >
+    <div className='grid'>
+
       <header className="bg-blue-600 py-4">
         <div className="container mx-auto flex justify-between items-center">
           <div className='grid'>
@@ -44,12 +38,23 @@ function App() {
           </nav>
         </div>
       </header>
-      <MerchantListContainer merchantService={merchantService} />
 
-      <div className='grid'>
-        <SellMerchant service={marketService} />
+      <div className='flex bg-rose-100 h-screen w-screen' >
+
+        <MerchantListContainer merchantService={merchantService} />
+
+
+        <div className='bg-indigo-400 w-1/4'>
+          <div className='grid  h-3/4'>
+            <SellMerchant service={marketService} />
+            <BuyMerchant service={marketService} />
+            <GetProfits service={marketService} />
+          </div>
+        </div>
+
       </div>
     </div>
+
   )
 }
 

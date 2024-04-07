@@ -15,4 +15,5 @@ export class SuiService {
     })
     return Number(Number(res.totalBalance) / 1000_000_000).toFixed(2)
   }
+
 }

@@ -1,7 +1,6 @@
 module suimarket::merchantmarket {
-    // Imports
-    use sui::table::{Self, Table};
-    use sui::coin::{Self, Coin};
+    use sui::table::{Self as Table, Table};
+    use sui::coin::{Self as Coin, Coin};
     use sui::sui::SUI;
     use sui::event;
     use soldier::merchant::Merchant;
@@ -60,7 +59,7 @@ module suimarket::merchantmarket {
         merchant: Merchant,
         price: u64,
         ctx: &mut TxContext,
-    ): u64 {
+    ) -> u64 {
         let seller = tx_context::sender(ctx);
         let listing = Listing {
             id: object::new(ctx),
@@ -68,16 +67,15 @@ module suimarket::merchantmarket {
             merchant,
             owner: seller,
         };
-
+        
         let sold_id = market.order_id;
         table::add(&mut market.listings, sold_id, listing);
         market.order_id = sold_id + 1;
-
+        
         event::emit(MerchantListed {
             order_id: sold_id,
             seller,
         });
-
         sold_id
     }
 
@@ -88,13 +86,7 @@ module suimarket::merchantmarket {
         payment: Coin<SUI>,
         ctx: &mut TxContext,
     ) {
-        let Listing {
-            id,
-            price,
-            merchant,
-            owner,
-        } = table::remove(&mut market.listings, order_id);
-
+        let Listing { id, price, merchant, owner } = table::remove(&mut market.listings, order_id);
         assert!(coin::value(&payment) == price, E_COIN_VALUE_INCORRECT);
 
         if table::contains(&market.profits, owner) {
@@ -108,7 +100,6 @@ module suimarket::merchantmarket {
 
         object::delete(id);
         let buyer = tx_context::sender(ctx);
-
         event::emit(MerchantBought {
             merchant_id: object::id(&merchant),
             buyer,
@@ -118,7 +109,10 @@ module suimarket::merchantmarket {
     }
 
     /// Retrieves the profits for the sender from the market.
-    public entry fun get_profits(market: &mut Market, ctx: &mut TxContext) {
+    public entry fun get_profits(
+        market: &mut Market,
+        ctx: &mut TxContext,
+    ) {
         let sender = tx_context::sender(ctx);
         let coin = table::remove(&mut market.profits, sender);
         transfer::public_transfer(coin, sender);

@@ -3,6 +3,11 @@ module suimarket::merchantmarket {
     use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::event;
+    use sui::bag::{Self, Bag};
+    use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
+    use sui::kiosk_extension::{Self as ke};
+    use sui::transfer_policy::{Self as tp};
+    use sui::package::{Self, Publisher};
 
     use suimarket::merchant::{Merchant};
 
@@ -38,21 +43,50 @@ module suimarket::merchantmarket {
         owner: address,
     }
 
-    // Public Functions
-    /// Creates a new marketplace.
-    public entry fun create_marketplace(ctx: &mut TxContext) {
-        let id = object::new(ctx);
-        let listings = table::new<u64, Listing>(ctx);
-        let profits = table::new<address, Coin<SUI>>(ctx);
+     /// Publisher capability object
+    public struct HousePublisher has key { id: UID, publisher: Publisher }
 
-        transfer::share_object(Market {
-            id,
-            listings,
-            profits,
-            order_id: 0,
-        });
+     // one time witness 
+    public  struct MERCHANTMARKET has drop {}
+
+    // kiosk_extension witness
+    public struct HouseKioskExtWitness has drop {}
+
+    // =================== Initializer ===================
+    fun init(otw: MERCHANTMARKET, ctx: &mut TxContext) {
+        // define the publisher
+        let publisher_ = package::claim<MERCHANTMARKET>(otw, ctx);
+        // wrap the publisher and share.
+        transfer::share_object(HousePublisher {
+            id: object::new(ctx),
+            publisher: publisher_
+        }); 
     }
 
+    // === Public-Mutative Functions ===
+
+    /// Users can create new kiosk for marketplace 
+    public fun new(ctx: &mut TxContext) {
+        let(mut kiosk, kiosk_cap) = kiosk::new(ctx);
+        // share the kiosk
+        let witness = HouseKioskExtWitness {};
+        // create and extension for using bag
+        ke::add<HouseKioskExtWitness>(witness, &mut kiosk, &kiosk_cap, 00, ctx);
+        transfer::public_share_object(kiosk);
+        // you can send the cap with ptb
+        transfer::public_transfer(kiosk_cap, ctx.sender());
+    }
+    // create any transferpolicy for rules 
+    public fun new_policy(publish: &HousePublisher, ctx: &mut TxContext ) {
+        // set the publisher
+        let publisher = get_publisher(publish);
+        // create an transfer_policy and tp_cap
+        let (transfer_policy, tp_cap) = tp::new<Merchant>(publisher, ctx);
+        // transfer the objects 
+        transfer::public_transfer(tp_cap, tx_context::sender(ctx));
+        transfer::public_share_object(transfer_policy);
+    }
+    
     /// Lists a merchant for sale in the market.
     /// Returns the order ID of the listing.
     public entry fun sell_merchant(
@@ -117,4 +151,9 @@ module suimarket::merchantmarket {
         let coin = table::remove(&mut market.profits, sender);
         transfer::public_transfer(coin, sender);
     }
+
+    // return the publisher
+    fun get_publisher(shared: &HousePublisher) : &Publisher {
+        &shared.publisher
+     }
 }

@@ -15,30 +15,10 @@ module suimarket::merchantmarket {
     const E_COIN_VALUE_INCORRECT: u64 = 0;
 
     // Structs
-    /// Represents a merchant listing event.
-    public struct MerchantListed has copy, drop {
-        order_id: u64,
-        seller: address,
-    }
-
-    /// Represents a merchant purchase event.
-    public struct MerchantBought has copy, drop {
-        merchant_id: ID,
-        buyer: address,
-    }
-
-    /// Represents the market for buying and selling merchants.
-    public struct Market has key {
-        id: UID,
-        listings: Table<u64, Listing>,
-        profits: Table<address, Coin<SUI>>,
-        order_id: u64,
-    }
-
+    
     /// Represents a merchant listing.
     public struct Listing has key, store {
         id: UID,
-        price: u64,
         merchant: Merchant,
         owner: address,
     }
@@ -50,7 +30,7 @@ module suimarket::merchantmarket {
     public  struct MERCHANTMARKET has drop {}
 
     // kiosk_extension witness
-    public struct HouseKioskExtWitness has drop {}
+    public struct MerchantKioskExtWitness has drop {}
 
     // =================== Initializer ===================
     fun init(otw: MERCHANTMARKET, ctx: &mut TxContext) {
@@ -69,9 +49,9 @@ module suimarket::merchantmarket {
     public fun new(ctx: &mut TxContext) {
         let(mut kiosk, kiosk_cap) = kiosk::new(ctx);
         // share the kiosk
-        let witness = HouseKioskExtWitness {};
+        let witness = MerchantKioskExtWitness {};
         // create and extension for using bag
-        ke::add<HouseKioskExtWitness>(witness, &mut kiosk, &kiosk_cap, 00, ctx);
+        ke::add<MerchantKioskExtWitness>(witness, &mut kiosk, &kiosk_cap, 00, ctx);
         transfer::public_share_object(kiosk);
         // you can send the cap with ptb
         transfer::public_transfer(kiosk_cap, ctx.sender());
@@ -81,76 +61,32 @@ module suimarket::merchantmarket {
         // set the publisher
         let publisher = get_publisher(publish);
         // create an transfer_policy and tp_cap
-        let (transfer_policy, tp_cap) = tp::new<Merchant>(publisher, ctx);
+        let (transfer_policy, tp_cap) = tp::new<Listing>(publisher, ctx);
         // transfer the objects 
         transfer::public_transfer(tp_cap, tx_context::sender(ctx));
         transfer::public_share_object(transfer_policy);
     }
-    
-    /// Lists a merchant for sale in the market.
-    /// Returns the order ID of the listing.
-    public entry fun sell_merchant(
-        market: &mut Market,
-        merchant: Merchant,
-        price: u64,
-        ctx: &mut TxContext,
-    ) : u64 {
-        let seller = tx_context::sender(ctx);
-        let listing = Listing {
+
+    public fun wrap(item: Merchant, ctx: &mut TxContext) {
+        let listing_ = Listing {
             id: object::new(ctx),
-            price,
+            merchant: item,
+            owner: ctx.sender()
+        };
+        transfer::public_transfer(listing_, ctx.sender());
+    }
+
+    public fun unwrap(item: Listing, ctx: &mut TxContext) {
+        let Listing {
+            id,
             merchant,
-            owner: seller,
-        };
-        
-        let sold_id = market.order_id;
-        table::add(&mut market.listings, sold_id, listing);
-        market.order_id = sold_id + 1;
-        
-        event::emit(MerchantListed {
-            order_id: sold_id,
-            seller,
-        });
-        sold_id
-    }
-    /// Buys a merchant from the market using the provided payment.
-    public entry fun buy_merchant(
-        market: &mut Market,
-        order_id: u64,
-        payment: Coin<SUI>,
-        ctx: &mut TxContext,
-    ) {
-        let Listing { id, price, merchant, owner } = table::remove(&mut market.listings, order_id);
-        assert!(coin::value(&payment) == price, E_COIN_VALUE_INCORRECT);
-
-        if (table::contains(&market.profits, owner)) {
-            coin::join(
-                table::borrow_mut(&mut market.profits, owner),
-                payment,
-            )
-        } else {
-            table::add(&mut market.profits, owner, payment)
-        };
-        
+            owner: _
+        }  = item;
         object::delete(id);
-        let buyer = tx_context::sender(ctx);
-        event::emit(MerchantBought {
-            merchant_id: object::id(&merchant),
-            buyer,
-        });
-
-        transfer::public_transfer(merchant, buyer);
+        transfer::public_transfer(merchant, ctx.sender());
     }
 
-    /// Retrieves the profits for the sender from the market.
-    public entry fun get_profits(
-        market: &mut Market,
-        ctx: &mut TxContext,
-    ) {
-        let sender = tx_context::sender(ctx);
-        let coin = table::remove(&mut market.profits, sender);
-        transfer::public_transfer(coin, sender);
-    }
+    
 
     // return the publisher
     fun get_publisher(shared: &HousePublisher) : &Publisher {

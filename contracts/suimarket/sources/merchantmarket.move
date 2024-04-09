@@ -79,7 +79,6 @@ module suimarket::merchantmarket {
         });
         sold_id
     }
-
     /// Buys a merchant from the market using the provided payment.
     public entry fun buy_merchant(
         market: &mut Market,
@@ -98,7 +97,7 @@ module suimarket::merchantmarket {
         } else {
             table::add(&mut market.profits, owner, payment)
         };
-
+        
         object::delete(id);
         let buyer = tx_context::sender(ctx);
         event::emit(MerchantBought {

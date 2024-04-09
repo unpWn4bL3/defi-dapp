@@ -1,120 +1,95 @@
 module suimarket::merchantmarket {
-    use sui::table::{Self as Table, Table};
-    use sui::coin::{Self as Coin, Coin};
+    use sui::table::{Self, Table};
+    use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::event;
-    use soldier::merchant::Merchant;
+    use sui::bag::{Self, Bag};
+    use sui::kiosk::{Self, Kiosk, KioskOwnerCap};
+    use sui::kiosk_extension::{Self as ke};
+    use sui::transfer_policy::{Self as tp};
+    use sui::package::{Self, Publisher};
 
-    // Constants
-    const E_COIN_VALUE_INCORRECT: u64 = 0;
+    use suimarket::merchant::{Merchant};
 
     // Structs
-    /// Represents a merchant listing event.
-    public struct MerchantListed has copy, drop {
-        order_id: u64,
-        seller: address,
-    }
-
-    /// Represents a merchant purchase event.
-    public struct MerchantBought has copy, drop {
-        merchant_id: ID,
-        buyer: address,
-    }
-
-    /// Represents the market for buying and selling merchants.
-    public struct Market has key {
-        id: UID,
-        listings: Table<u64, Listing>,
-        profits: Table<address, Coin<SUI>>,
-        order_id: u64,
-    }
 
     /// Represents a merchant listing.
     public struct Listing has key, store {
         id: UID,
-        price: u64,
         merchant: Merchant,
         owner: address,
     }
 
-    // Public Functions
-    /// Creates a new marketplace.
-    public entry fun create_marketplace(ctx: &mut TxContext) {
-        let id = object::new(ctx);
-        let listings = table::new<u64, Listing>(ctx);
-        let profits = table::new<address, Coin<SUI>>(ctx);
+     /// Publisher capability object
+    public struct MarketPublisher has key { id: UID, publisher: Publisher }
 
-        transfer::share_object(Market {
-            id,
-            listings,
-            profits,
-            order_id: 0,
-        });
-    }
+     // one time witness 
+    public  struct MERCHANTMARKET has drop {}
 
-    /// Lists a merchant for sale in the market.
-    /// Returns the order ID of the listing.
-    public entry fun sell_merchant(
-        market: &mut Market,
-        merchant: Merchant,
-        price: u64,
-        ctx: &mut TxContext,
-    ) -> u64 {
-        let seller = tx_context::sender(ctx);
-        let listing = Listing {
+    // kiosk_extension witness
+    public struct MerchantKioskExtWitness has drop {}
+
+    // =================== Initializer ===================
+    fun init(otw: MERCHANTMARKET, ctx: &mut TxContext) {
+        // define the publisher
+        let publisher_ = package::claim<MERCHANTMARKET>(otw, ctx);
+        // wrap the publisher and share.
+        transfer::share_object(MarketPublisher {
             id: object::new(ctx),
-            price,
+            publisher: publisher_
+        }); 
+    }
+
+    // === Public-Mutative Functions ===
+
+    /// Users can create new kiosk for marketplace 
+    public fun new(ctx: &mut TxContext) : KioskOwnerCap {
+        let(mut kiosk, kiosk_cap) = kiosk::new(ctx);
+        // share the kiosk
+        let witness = MerchantKioskExtWitness {};
+        // create and extension for using bag
+        ke::add<MerchantKioskExtWitness>(witness, &mut kiosk, &kiosk_cap, 00, ctx);
+        transfer::public_share_object(kiosk);
+        // you can send the cap with ptb
+        kiosk_cap
+    }
+    // create any transferpolicy for rules 
+    public fun new_policy(publish: &MarketPublisher, ctx: &mut TxContext ) {
+        // set the publisher
+        let publisher = get_publisher(publish);
+        // create an transfer_policy and tp_cap
+        let (transfer_policy, tp_cap) = tp::new<Listing>(publisher, ctx);
+        // transfer the objects 
+        transfer::public_transfer(tp_cap, tx_context::sender(ctx));
+        transfer::public_share_object(transfer_policy);
+    }
+
+    public fun wrap(item: Merchant, ctx: &mut TxContext) {
+        let listing_ = Listing {
+            id: object::new(ctx),
+            merchant: item,
+            owner: ctx.sender()
+        };
+        transfer::public_transfer(listing_, ctx.sender());
+    }
+
+    public fun unwrap(item: Listing, ctx: &mut TxContext) {
+        let Listing {
+            id,
             merchant,
-            owner: seller,
-        };
-        
-        let sold_id = market.order_id;
-        table::add(&mut market.listings, sold_id, listing);
-        market.order_id = sold_id + 1;
-        
-        event::emit(MerchantListed {
-            order_id: sold_id,
-            seller,
-        });
-        sold_id
-    }
-
-    /// Buys a merchant from the market using the provided payment.
-    public entry fun buy_merchant(
-        market: &mut Market,
-        order_id: u64,
-        payment: Coin<SUI>,
-        ctx: &mut TxContext,
-    ) {
-        let Listing { id, price, merchant, owner } = table::remove(&mut market.listings, order_id);
-        assert!(coin::value(&payment) == price, E_COIN_VALUE_INCORRECT);
-
-        if table::contains(&market.profits, owner) {
-            coin::join(
-                table::borrow_mut(&mut market.profits, owner),
-                payment,
-            )
-        } else {
-            table::add(&mut market.profits, owner, payment)
-        };
-
+            owner: _
+        }  = item;
         object::delete(id);
-        let buyer = tx_context::sender(ctx);
-        event::emit(MerchantBought {
-            merchant_id: object::id(&merchant),
-            buyer,
-        });
-
-        transfer::public_transfer(merchant, buyer);
+        transfer::public_transfer(merchant, ctx.sender());
     }
+    // return the publisher
+    fun get_publisher(shared: &MarketPublisher) : &Publisher {
+        &shared.publisher
+     }
 
-    /// Retrieves the profits for the sender from the market.
-    public entry fun get_profits(
-        market: &mut Market,
-        ctx: &mut TxContext,
-    ) {
-        let sender = tx_context::sender(ctx);
-        let coin = table::remove(&mut market.profits, sender);
-        transfer::public_transfer(coin, sender);
+     #[test_only]
+    // call the init function
+    public fun test_init(ctx: &mut TxContext) {
+        init(MERCHANTMARKET {}, ctx);
     }
 }

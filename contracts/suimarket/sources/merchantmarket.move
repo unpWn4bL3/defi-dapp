@@ -1,9 +1,10 @@
 module suimarket::merchantmarket {
-    use sui::table::{Self as Table, Table};
-    use sui::coin::{Self as Coin, Coin};
+    use sui::table::{Self, Table};
+    use sui::coin::{Self, Coin};
     use sui::sui::SUI;
     use sui::event;
-    use soldier::merchant::Merchant;
+
+    use suimarket::merchant::{Merchant};
 
     // Constants
     const E_COIN_VALUE_INCORRECT: u64 = 0;
@@ -59,7 +60,7 @@ module suimarket::merchantmarket {
         merchant: Merchant,
         price: u64,
         ctx: &mut TxContext,
-    ) -> u64 {
+    ) : u64 {
         let seller = tx_context::sender(ctx);
         let listing = Listing {
             id: object::new(ctx),
@@ -89,7 +90,7 @@ module suimarket::merchantmarket {
         let Listing { id, price, merchant, owner } = table::remove(&mut market.listings, order_id);
         assert!(coin::value(&payment) == price, E_COIN_VALUE_INCORRECT);
 
-        if table::contains(&market.profits, owner) {
+        if (table::contains(&market.profits, owner)) {
             coin::join(
                 table::borrow_mut(&mut market.profits, owner),
                 payment,

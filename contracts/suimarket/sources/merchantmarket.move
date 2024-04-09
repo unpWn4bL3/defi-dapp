@@ -11,11 +11,8 @@ module suimarket::merchantmarket {
 
     use suimarket::merchant::{Merchant};
 
-    // Constants
-    const E_COIN_VALUE_INCORRECT: u64 = 0;
-
     // Structs
-    
+
     /// Represents a merchant listing.
     public struct Listing has key, store {
         id: UID,
@@ -24,7 +21,7 @@ module suimarket::merchantmarket {
     }
 
      /// Publisher capability object
-    public struct HousePublisher has key { id: UID, publisher: Publisher }
+    public struct MarketPublisher has key { id: UID, publisher: Publisher }
 
      // one time witness 
     public  struct MERCHANTMARKET has drop {}
@@ -37,7 +34,7 @@ module suimarket::merchantmarket {
         // define the publisher
         let publisher_ = package::claim<MERCHANTMARKET>(otw, ctx);
         // wrap the publisher and share.
-        transfer::share_object(HousePublisher {
+        transfer::share_object(MarketPublisher {
             id: object::new(ctx),
             publisher: publisher_
         }); 
@@ -46,7 +43,7 @@ module suimarket::merchantmarket {
     // === Public-Mutative Functions ===
 
     /// Users can create new kiosk for marketplace 
-    public fun new(ctx: &mut TxContext) {
+    public fun new(ctx: &mut TxContext) : KioskOwnerCap {
         let(mut kiosk, kiosk_cap) = kiosk::new(ctx);
         // share the kiosk
         let witness = MerchantKioskExtWitness {};
@@ -54,10 +51,10 @@ module suimarket::merchantmarket {
         ke::add<MerchantKioskExtWitness>(witness, &mut kiosk, &kiosk_cap, 00, ctx);
         transfer::public_share_object(kiosk);
         // you can send the cap with ptb
-        transfer::public_transfer(kiosk_cap, ctx.sender());
+        kiosk_cap
     }
     // create any transferpolicy for rules 
-    public fun new_policy(publish: &HousePublisher, ctx: &mut TxContext ) {
+    public fun new_policy(publish: &MarketPublisher, ctx: &mut TxContext ) {
         // set the publisher
         let publisher = get_publisher(publish);
         // create an transfer_policy and tp_cap
@@ -85,11 +82,14 @@ module suimarket::merchantmarket {
         object::delete(id);
         transfer::public_transfer(merchant, ctx.sender());
     }
-
-    
-
     // return the publisher
-    fun get_publisher(shared: &HousePublisher) : &Publisher {
+    fun get_publisher(shared: &MarketPublisher) : &Publisher {
         &shared.publisher
      }
+
+     #[test_only]
+    // call the init function
+    public fun test_init(ctx: &mut TxContext) {
+        init(MERCHANTMARKET {}, ctx);
+    }
 }

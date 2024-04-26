@@ -1,3 +1,37 @@
+# contract test recorded on testnet - 2nd time
+
+publisher
+0x271e75c8b09d51a88c656c998265ee940db82211d50b54b46e09d65e3d9537f7
+
+seller
+0x61f126859c7f3c744669f30767363c32d7b766e9ebdb8ab96817b46b0c90b285
+
+buyer
+0xf28fefd776b6c9d164aa3e8210afdc817dc6fd6c04b24fc12bf1705de6335b54
+
+package soldier: 
+0xa9a89a8b051789ff6ad0044fcb592c74d73df0b663304083388d601b55616dec
+
+package suimarket: 
+0x0fbbac41d36697e75bb03ae826f949ecbdaad1f33a9f6e20cd4dfcbfd234836d
+
+publisher create market: 
+0xa6a22649f74f6a5dae0369935a7fe01625eb447f632e975be5c506495c14ab6b
+
+seller create merchant: 
+Aks9E2fi1HThYKstbsxxYCrqBsFHfV4jKy1YkEZdKWBF
+0xc369f1522e25f40f158f94b0f6593c704072c7bb2836e9c3969b22efdea832ee
+
+seller create listing: 
+7owZJVMJ5rbS3RCpSedMce2TwH3XV7iXtEdmSy5LVj4o
+order_id │ 0
+
+buyer bought merchant: 
+E2s5Lt1vP3qfsZagcJhCutaUFLaHAGXy8Wu3GcXcVkGx
+
+seller get profits: 
+22qFQZwjoiKpGFxHqgd7JzVrJ3ahTiC9RzE48yRXj39X
+
 # contract test recorded on testnet
 
 publisher 0x271e75c8b09d51a88c656c998265ee940db82211d50b54b46e09d65e3d9537f7

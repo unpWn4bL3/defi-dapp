@@ -3,7 +3,7 @@ name = "Soldier"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 # license = ""           # e.g., "MIT", "GPL", "Apache 2.0"
 # authors = ["..."]      # e.g., ["Joe Smith (joesmith@noemail.com)", "John Snow (johnsnow@noemail.com)"]
-published-at = "0x92f195cce2802ea5e5d91cb66ab215b9e85b22a4cc11d85baabed257776b7680"
+published-at = "0xa9a89a8b051789ff6ad0044fcb592c74d73df0b663304083388d601b55616dec"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }
@@ -20,7 +20,7 @@ Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-fram
 # Override = { local = "../conflicting/version", override = true }
 
 [addresses]
-soldier = "0x92f195cce2802ea5e5d91cb66ab215b9e85b22a4cc11d85baabed257776b7680"
+soldier = "0xa9a89a8b051789ff6ad0044fcb592c74d73df0b663304083388d601b55616dec"
 
 # Named addresses will be accessible in Move as `@name`. They're also exported:
 # for example, `std = "0x1"` is exported by the Standard Library.
